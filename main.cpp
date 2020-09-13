@@ -13,17 +13,23 @@ private:
 	sf::Text text;
 
 public:
-	Button (char *str, const sf::Color &color, int x, int y)
+	Button (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, char str[] = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black)
 	{
-		rectangle = sf::RectangleShape (sf::Vector2f (200, 60));
-		rectangle.setFillColor (color);
-		rectangle.setPosition (x, y);
+		rectangle = sf::RectangleShape (sf::Vector2f (x_size, y_size));
+		rectangle.setFillColor (rect_color);
+		rectangle.setPosition (x_pos, y_pos);
 
 		static sf::Font font;
 		font.loadFromFile ("Country_Western_Regular.ttf");
-		text = sf::Text (str, font, 50);
-		text.setFillColor (sf::Color::Black);
-		text.setPosition (x + 5, y + 5);
+		text = sf::Text (str, font, text_size);
+		text.setFillColor (text_color);
+		text.setPosition (x_pos + 1, y_pos + 1);
+	}
+
+	bool pressed (sf::RenderWindow &window)
+	{
+		sf::Vector2i mouse_pos = sf::Mouse::getPosition (window);
+		return rectangle.getGlobalBounds ().contains (mouse_pos.x, mouse_pos.y);
 	}
 
 	void draw (sf::RenderWindow &window)
@@ -97,23 +103,10 @@ int main()
 
 	Graph gr (100, 100, 0.1, sf::Color::Blue);
 
-	//Button button_bubble ("Bubble", sf::Color (150, 0, 0), 0, 0);
+	Button button_bubble (200, 200, 100, 30, sf::Color::Red, "Bubble");
 
 	for (float f = -10; f < 10; f += 0.1)
-		gr.add_point (f,  sqrt (99 - f * f));
-	/*
-	gr.add_point (0, 0);
-	gr.add_point (10, 0);
-	gr.add_point (20, 0);
-	gr.add_point (30, 0);
-	gr.add_point (40, 0);*/
-/*
-	func[0].color = sf::Color::Blue;
-	func[1].color = sf::Color::Blue;
-	func[2].color = sf::Color::Blue;
-	func[3].color = sf::Color::Blue;
-	func[4].color = sf::Color::Blue;
-*/
+		gr.add_point (f,  1 / f);
 
 
 
@@ -122,9 +115,8 @@ int main()
 	{
 		window.clear (sf::Color (255, 255, 255));
 
-		//window.draw (func);
 		gr.draw (window);
-		//button_bubble.draw (window);
+		button_bubble.draw (window);
 
 
 		sf::Event event;
@@ -136,10 +128,11 @@ int main()
 
 			if (event.type == sf::Event::MouseButtonPressed && static_cast<int> (event.key.code) == static_cast<int> (sf::Mouse::Left))
 			{
-				sf::Vector2i mouse_pos = sf::Mouse::getPosition (window);
-/*
-				if (button_1.getGlobalBounds ().contains (mouse_pos.x, mouse_pos.y))
-					std::cout << "Button pressed!\n";*/
+				//sf::Vector2i mouse_pos = sf::Mouse::getPosition (window);
+
+				//if (button_bubble.getGlobalBounds ().contains (mouse_pos.x, mouse_pos.y))
+				if (button_bubble.pressed (window))
+					std::cout << "Button pressed!\n";
 			}
 		}
 
