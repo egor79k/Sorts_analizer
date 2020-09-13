@@ -60,19 +60,19 @@ void selection_sort (T *array, size_t size)
 	for (size_t i = 0; i < size - 1; ++i)
 	{				
 		size_t min_index = i;
- 		
+		
 		for (size_t j = i + 1; j < size; ++j)
 		{			
 			if (array[j] < array[min_index])				
 				min_index = j;
 		}
- 		                
+						
 		std::swap (array[i], array[min_index]);
 	}
 }
 
 
-
+/*
 template <typename T>
 void merge(T *array, int first, int last)
 {
@@ -103,25 +103,45 @@ void merge(T *array, int first, int last)
 }
 
 template <typename T>
-void merge_sort (T *array, int first, int last)
+void merge_sort_recursive (T *array, int first, int last)
 {
 	if (first < last)
 	{
-		merge_sort (array, first, (first + last) / 2);
-		merge_sort (array, (first + last) / 2 + 1, last);
+		merge_sort_recursive (array, first, (first + last) / 2);
+		merge_sort_recursive (array, (first + last) / 2 + 1, last);
 		merge (array, first, last);
 	}
 }
 
-/*
-
 template <typename T>
-void print (T *array, size_t n)
+void merge_sort (T *array, size_t size)
 {
-	std::cout << '\n';
-	for (size_t i = 0; i < n; ++i)
-		std::cout << array[i] << ' ';
-	std::cout << '\n';
-	return;
+	merge_sort_recursive<T> (array, 0, size);
 }
 */
+
+
+template <typename T>
+void gnome_sort (T *array, size_t size)
+{
+	int i = 1;
+	int j = 2;
+	while (i < size)
+	{
+		if (array[i - 1] > array[i])
+		{
+			i = j;
+			j = j + 1;
+		}
+		else
+		{
+			std::swap (array[i - 1], array[i]);
+			i = i - 1;
+			if (i == 0)
+			{
+				i = j;
+				j = j + 1;
+			}
+		}
+	}
+}
