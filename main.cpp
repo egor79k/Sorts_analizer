@@ -113,9 +113,6 @@ sort_counter<int> *generate_array (int size)
 
 void draw_sort_graph (Graph &compares_graph, Graph &assigns_graph, void (*sort) (sort_counter<int> *, size_t))
 {
-	//Graph compares_graph (5, 300, 10, 10000, sf::Color::Red);
-	//Graph assigns_graph  (250, 300, 10, 10000, sf::Color::Red);
-
 	for (int i = 100; i < 3000; i += 100)
 	{
 		sort_counter<int> *array = generate_array (i);
@@ -131,16 +128,47 @@ void draw_sort_graph (Graph &compares_graph, Graph &assigns_graph, void (*sort) 
 
 int main()
 {
+	int button_x_pos = 10;
+
+	struct sort_algorithm
+	{
+		bool counted = false;
+		void (*sort) (sort_counter<int> *, size_t);
+		Button button;
+		Graph compares_graph;
+		Graph assigns_graph;
+
+		sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, char *name) :
+			sort (sort_alg),
+			button (Button (10, 600, 150, 70, color, name, 35)),
+			compares_graph (Graph (5, 500, 10, 10000, color)),
+			assigns_graph (Graph (350, 500, 10, 10000, color))
+		{}// button_x_pos += 160; }
+	};
+
+	sort_algorithm bubble    (bubble_sort,    sf::Color::Red,          "Bubble");
+	sort_algorithm quick     (quick_sort,     sf::Color::Green,        "Quick");
+	sort_algorithm selection (selection_sort, sf::Color::Blue,         "Selection");
+	//sort_algorithm merge     (sf::Color (0, 255, 255), "Merge");
+
+	//bool bubble_counted    = false;
+	//bool quick_counted     = false;
+	//bool selection_counted = false;
+	//bool merge_counted     = false;
+
+
 	sf::RenderWindow window(sf::VideoMode(700, 700), "Sorts analizer");
 
 	//Graph gr (100, 100, 5, 10000, sf::Color::Blue);
-	Graph compares_graph (5, 500, 10, 10000, sf::Color::Red);
-	Graph assigns_graph  (350, 500, 10, 10000, sf::Color::Red);
+	//Graph bubble_compares_graph (5,   500, 10, 10000, sf::Color::Red);
+	//Graph bubble_assigns_graph  (350, 500, 10, 10000, sf::Color::Red);
+	//Graph quick_compares_graph  (5,   500, 10, 10000, sf::Color::Green);
+	//Graph quick_assigns_graph   (350, 500, 10, 10000, sf::Color::Green);
 
-	Button button_bubble    (10,  600, 150, 70, sf::Color::Red,    "Bubble",      40);
-	Button button_quick     (170, 600, 150, 70, sf::Color::Green,  "Quick",       40);
-	Button button_selection (330, 600, 150, 70, sf::Color::Blue,   "Selection",   40);
-	Button button_merge     (490, 600, 150, 70, sf::Color (0, 255, 255), "Merge", 40);
+	//Button button_bubble    (10,  600, 150, 70, sf::Color::Red,    "Bubble",      35);
+	//Button button_quick     (170, 600, 150, 70, sf::Color::Green,  "Quick",       35);
+	//Button button_selection (330, 600, 150, 70, sf::Color::Blue,   "Selection",   35);
+	//Button button_merge     (490, 600, 150, 70, sf::Color (0, 255, 255), "Merge", 35);
 
 	//for (int f = 100; f < 1000; f += 100)
 		//gr.add_point (f,  f * f);
@@ -153,13 +181,29 @@ int main()
 		window.clear (sf::Color (255, 255, 255));
 
 		//gr.draw (window);
-		button_bubble.draw    (window);
-		button_quick.draw     (window);
-		button_selection.draw (window);
-		button_merge.draw     (window);
+		bubble.button.draw    (window);
+		quick.button.draw     (window);
+		selection.button.draw (window);
+		//merge.button.draw     (window);
 
-		compares_graph.draw (window);
-		assigns_graph.draw  (window);
+
+		if (bubble.counted)
+		{
+			bubble.compares_graph.draw (window);
+			bubble.assigns_graph.draw (window);
+		}
+
+		if (quick.counted)
+		{
+			quick.compares_graph.draw (window);
+			quick.assigns_graph.draw (window);
+		}
+
+		if (selection.counted)
+		{
+			selection.compares_graph.draw (window);
+			selection.assigns_graph.draw (window);
+		}
 
 		sf::Event event;
 		
@@ -170,11 +214,23 @@ int main()
 
 			if (event.type == sf::Event::MouseButtonPressed && static_cast<int> (event.key.code) == static_cast<int> (sf::Mouse::Left))
 			{
-				//sf::Vector2i mouse_pos = sf::Mouse::getPosition (window);
-
-				//if (button_bubble.getGlobalBounds ().contains (mouse_pos.x, mouse_pos.y))
-				if (button_bubble.pressed (window))
-					draw_sort_graph (compares_graph, assigns_graph, bubble_sort<sort_counter<int>>);
+				if (bubble.button.pressed (window) && !bubble.counted)
+				{
+					draw_sort_graph (bubble.compares_graph, bubble.assigns_graph, bubble.sort);
+					bubble.counted = true;
+				}
+				else if (quick.button.pressed (window) && !quick.counted)
+				{
+					draw_sort_graph (quick.compares_graph, quick.assigns_graph, quick.sort);
+					quick.counted = true;
+				}
+				else if (selection.button.pressed (window) && !selection.counted)
+				{
+					draw_sort_graph (selection.compares_graph, selection.assigns_graph, selection.sort);
+					selection.counted = true;
+				}
+				//else if (merge.button.pressed (window))
+					//draw_sort_graph (compares_graph, assigns_graph, <sort_counter<int>>);
 			}
 		}
 
