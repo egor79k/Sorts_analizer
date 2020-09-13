@@ -1,4 +1,4 @@
-//#include <iostream>
+#include <iostream>
 
 
 template <typename T>
@@ -8,9 +8,10 @@ void bubble_sort (T *array, size_t size)
 		for (size_t j = 0; j < size - i - 1; ++j)
 			if (array[j] > array[j + 1])
 			{
-				T tmp = array[j];
+				std::swap (array[j], array[j + 1]);
+				/*T tmp = array[j];
 				array[j] = array[j + 1];
-				array[j + 1] = tmp;
+				array[j + 1] = tmp;*/
 			}
 }
 
@@ -33,9 +34,10 @@ void quick_sort(T *array, size_t size)
 	
 		if (i <= j)
 		{
-			T tmp = array[i];
+			std::swap (array[i], array[j]);
+			/*T tmp = array[i];
 			array[i] = array[j];
-			array[j] = tmp;
+			array[j] = tmp;*/
 
 			++i;
 			--j;
@@ -65,7 +67,7 @@ void selection_sort (T *array, size_t size)
 				min_index = j;
 		}
  		                
-		std::swap(array[i], array[min_index]);
+		std::swap (array[i], array[min_index]);
 	}
 }
 
@@ -111,7 +113,7 @@ void merge_sort (T *array, int first, int last)
 	}
 }
 
-
+/*
 
 template <typename T>
 void print (T *array, size_t n)
@@ -122,33 +124,4 @@ void print (T *array, size_t n)
 	std::cout << '\n';
 	return;
 }
-
-/*
-int main ()
-{
-	int array_1[10] = {5, 2, 8, 3, 1, 4, 9, 7, 6, 0};
-
-	int array_2[10] = {5, 2, 8, 3, 1, 4, 9, 7, 6, 0};
-
-	int array_3[10] = {5, 2, 8, 3, 1, 4, 9, 7, 6, 0};
-
-	int array_4[10] = {5, 2, 8, 3, 1, 4, 9, 7, 6, 0};
-
-	bubble_sort<int> (array_1, 10);
-
-	print<int> (array_1, 10);
-
-	quick_sort<int> (array_2, 10);
-
-	print<int> (array_2, 10);
-
-	selection_sort<int> (array_3, 10);
-
-	print<int> (array_3, 10);
-
-	merge_sort<int> (array_4, 0, 9);
-
-	print<int> (array_4, 10);
-
-	return 0;
-}*/
+*/
