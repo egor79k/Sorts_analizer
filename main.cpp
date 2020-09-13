@@ -21,7 +21,7 @@ public:
 		static sf::Font font;
 		font.loadFromFile ("Country_Western_Regular.ttf");
 		text = sf::Text (str, font, 50);
-		text.setColor (sf::Color::Black);
+		text.setFillColor (sf::Color::Black);
 		text.setPosition (x + 5, y + 5);
 	}
 
@@ -37,17 +37,30 @@ public:
 class Graph
 {
 private:
-	sf::VertexArray graph;
-	double scale;
-	sf::Color color;
 	const int x_pos;
 	const int y_pos;
-	const sf::RectangleShape Ox (Vector2f (100, 3));
-	const sf::RectangleShape Oy (Vector2f (3, 100));
+	int points_num;
+	float scale;
+	float max_x;
+	float max_y;
+	sf::Color color;
+	sf::RectangleShape Ox;
+	sf::RectangleShape Oy;
+	sf::VertexArray graph;
 
 
 public:
-	Graph (int x, int y, double sc, sf::Color col) : x_pos (x), y_pos (y), scale (sc), color (col)
+	Graph (int x, int y, float sc, const sf::Color &col) :
+		x_pos (x),
+		y_pos (y),
+		points_num (0),
+		scale (sc),
+		max_x (0),
+		max_y (0),
+		color (col),
+		Ox (sf::Vector2f (100,1)),
+		Oy (sf::Vector2f (1, 100)),
+		graph (sf::VertexArray (sf::LineStrip))
 	{
 		Ox.setPosition (x, y + 100);
 		Oy.setPosition (x, y);
@@ -58,15 +71,19 @@ public:
 	void add_point (int x, int y)
 	{
 		graph.append (sf::Vector2f (x_pos + x / scale, y_pos + 100 - y / scale));
+		graph[points_num].color = color;
+		++points_num;
 	}
 
 	void draw (sf::RenderWindow &window)
 	{
+		sf::RectangleShape Ox (Vector2f (max_point, 1));
+		sf::RectangleShape Oy;
 		window.draw (Ox);
 		window.draw (Oy);
 		window.draw (graph);
 	}
-}
+};
 
 
 
@@ -74,22 +91,24 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(500, 200), "Sorts analizer");
 
+	Graph gr (5, 5, 0.5, sf::Color::Blue);
+
 	//Button button_bubble ("Bubble", sf::Color (150, 0, 0), 0, 0);
 
-	sf::VertexArray func (sf::LineStrip);
 	
-	func.append (sf::Vector2f (0, 0));
-	func.append (sf::Vector2f (10, 30));
-	func.append (sf::Vector2f (20, 40));
-	func.append (sf::Vector2f (30, 30));
-	func.append (sf::Vector2f (40, 0));
-
+	
+	gr.add_point (0, 0);
+	gr.add_point (10, 30);
+	gr.add_point (20, 40);
+	gr.add_point (30, 30);
+	gr.add_point (40, 0);
+/*
 	func[0].color = sf::Color::Blue;
 	func[1].color = sf::Color::Blue;
 	func[2].color = sf::Color::Blue;
 	func[3].color = sf::Color::Blue;
 	func[4].color = sf::Color::Blue;
-
+*/
 
 
 
@@ -98,8 +117,8 @@ int main()
 	{
 		window.clear (sf::Color (255, 255, 255));
 
-		window.draw (func);
-
+		//window.draw (func);
+		gr.draw (window);
 		//button_bubble.draw (window);
 
 
