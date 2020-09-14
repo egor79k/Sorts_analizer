@@ -4,9 +4,18 @@
 #include "type_wrapper.cpp"
 
 
-
-const char text_format[] = "Crystal_Regular.ttf";
-
+const char Text_format[] = "Crystal_Regular.ttf";
+const int Compares_graph_x_pos = 5;
+const int Assigns_graph_x_pos  = 350;
+const int Graph_y_pos = 500;
+const int Window_side = 700;
+const int Rand_seed = 345234;
+const int Button_x_side = 150;
+const int Button_y_side = 70;
+const int Text_size = 35;
+const int Iterations = 5000;
+const int Graph_length = 333;
+const int Iter_step = 50;
 
 
 
@@ -24,7 +33,7 @@ public:
 		rectangle.setPosition (x_pos, y_pos);
 
 		static sf::Font font;
-		font.loadFromFile ("Crystal_Regular.ttf");
+		font.loadFromFile (Text_format);
 		text = sf::Text (str, font, text_size);
 		text.setFillColor (text_color);
 		text.setPosition (x_pos + 1, y_pos + 1);
@@ -114,10 +123,10 @@ struct sort_algorithm
 
 	sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, char *name) :
 		sort (sort_alg),
-		button (Button (button_x_pos, 600, 150, 70, color, name, 35)),
-		compares_graph (Graph (5, 500, 15, 10000, color)),
-		assigns_graph (Graph (350, 500, 15, 10000, color))
-	{ button_x_pos += 160; }
+		button (Button (button_x_pos, Graph_y_pos + 100, Button_x_side, Button_y_side, color, name, Text_size)),
+		compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color)),
+		assigns_graph  (Graph (Assigns_graph_x_pos,  Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color))
+	{ button_x_pos += (Button_x_side + 10); }
 };
 
 int sort_algorithm::button_x_pos = 10;
@@ -127,7 +136,7 @@ int sort_algorithm::button_x_pos = 10;
 sort_counter<int> *generate_array (int size)
 {
 	sort_counter<int> *arr = new sort_counter<int>[size];
-	srand (345234);
+	srand (Rand_seed);
 
 	for (int i = 0; i < size; ++i)
 		arr[i] = sort_counter<int> (rand () % RAND_MAX);
@@ -139,7 +148,7 @@ sort_counter<int> *generate_array (int size)
 
 void count_sort_graph (sort_algorithm &sort_alg)
 {
-	for (int i = 50; i < 5000; i += 50)
+	for (int i = Iter_step; i < Iterations; i += Iter_step)
 	{
 		sort_counter<int> *array = generate_array (i);
 		sort_counter<int>::reset ();
@@ -155,12 +164,21 @@ void count_sort_graph (sort_algorithm &sort_alg)
 
 int main()
 {
+	sf::Font font;
+	font.loadFromFile (Text_format);
+	sf::Text compares_title = sf::Text ("Compares",    font, Text_size);
+	sf::Text assigs_title   = sf::Text ("Assignments", font, Text_size);
+	compares_title.setFillColor (sf::Color::Black);
+	assigs_title.setFillColor   (sf::Color::Black);
+	compares_title.setPosition (Compares_graph_x_pos + 2, 5);
+	assigs_title.setPosition   (Assigns_graph_x_pos + 2 , 5);
+
 	sort_algorithm bubble    (bubble_sort,    sf::Color::Red,   "Bubble");
 	sort_algorithm quick     (quick_sort,     sf::Color::Green, "Quick");
 	sort_algorithm selection (selection_sort, sf::Color::Blue,  "Selection");
 	sort_algorithm gnome     (gnome_sort,     sf::Color (0, 255, 255), "Gnome");
 
-	sf::RenderWindow window(sf::VideoMode(700, 700), "Sorts analizer");
+	sf::RenderWindow window(sf::VideoMode (Window_side, Window_side), "Sorts analizer");
 
 
 	while (window.isOpen())
@@ -171,6 +189,9 @@ int main()
 		quick.button.draw     (window);
 		selection.button.draw (window);
 		gnome.button.draw     (window);
+
+		window.draw (compares_title);
+		window.draw (assigs_title);
 
 
 		if (bubble.counted)
