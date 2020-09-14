@@ -18,7 +18,7 @@ void bubble_sort (T *array, size_t size)
 
 
 template <typename T>
-void quick_sort(T *array, size_t size)
+void quick_sort (T *array, size_t size)
 {
 	int i = 0;
 	int j = size - 1;
@@ -26,10 +26,10 @@ void quick_sort(T *array, size_t size)
 	T mid = array[size / 2];
 
 	do {        
-		while(array[i] < mid)
+		while (array[i] < mid)
 			++i;
 
-		while(array[j] > mid)
+		while (array[j] > mid)
 			--j;
 	
 		if (i <= j)
@@ -45,7 +45,7 @@ void quick_sort(T *array, size_t size)
 	}
 	while (i <= j);
 
-	if(j > 0)
+	if (j > 0)
 		quick_sort(array, j + 1);
 
 	if (i < size)
