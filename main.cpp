@@ -16,6 +16,7 @@ const int Text_size = 35;
 const int Iterations = 5000;
 const int Graph_length = 333;
 const int Iter_step = 50;
+const int Color_diff = 50;
 
 
 
@@ -26,7 +27,7 @@ private:
 	sf::Text text;
 
 public:
-	Button (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, char str[] = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black)
+	Button (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, const char str[] = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black)
 	{
 		rectangle = sf::RectangleShape (sf::Vector2f (x_size, y_size));
 		rectangle.setFillColor (rect_color);
@@ -39,10 +40,24 @@ public:
 		text.setPosition (x_pos + 1, y_pos + 1);
 	}
 
-	bool pressed (sf::RenderWindow &window)
+	bool contain_coursor (sf::RenderWindow &window)
 	{
 		sf::Vector2i mouse_pos = sf::Mouse::getPosition (window);
 		return rectangle.getGlobalBounds ().contains (mouse_pos.x, mouse_pos.y);
+	}
+
+	void press ()
+	{
+		if (rectangle.getFillColor ().r >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r - Color_diff, rectangle.getFillColor ().g, rectangle.getFillColor ().b));
+		if (rectangle.getFillColor ().g >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g - Color_diff, rectangle.getFillColor ().b));
+		if (rectangle.getFillColor ().b >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g, rectangle.getFillColor ().b - Color_diff));
+	}
+
+	void release ()
+	{
+		if (rectangle.getFillColor ().r <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r + Color_diff, rectangle.getFillColor ().g, rectangle.getFillColor ().b));
+		if (rectangle.getFillColor ().g <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g + Color_diff, rectangle.getFillColor ().b));
+		if (rectangle.getFillColor ().b <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g, rectangle.getFillColor ().b + Color_diff));
 	}
 
 	void draw (sf::RenderWindow &window)
@@ -107,6 +122,19 @@ public:
 		window.draw (Ox);
 		window.draw (Oy);
 		window.draw (graph);
+/*
+		sf::Font font;
+		font.loadFromFile (Text_format);
+		//sf::Text x_number = sf::Text (itoa ((max_x - x_pos) * x_scale), font, Text_size);
+		//sf::Text y_number = sf::Text (itoa ((y_pos - max_y) * y_scale), font, Text_size);
+		sf::Text x_number = sf::Text ("666", font, 20);
+		sf::Text y_number = sf::Text ("777", font, 20);
+		x_number.setFillColor (sf::Color::Black);
+		y_number.setFillColor (sf::Color::Black);
+		x_number.setPosition (x_pos + max_x - x_number.getCharacterSize () * 3, y_pos + 1);
+		y_number.setPosition (x_pos - 5, y_pos - max_y);
+		window.draw (x_number);
+		window.draw (y_number);*/
 	}
 };
 
@@ -121,7 +149,7 @@ struct sort_algorithm
 	Graph compares_graph;
 	Graph assigns_graph;
 
-	sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, char *name) :
+	sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, const char name[]) :
 		sort (sort_alg),
 		button (Button (button_x_pos, Graph_y_pos + 100, Button_x_side, Button_y_side, color, name, Text_size)),
 		compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color)),
@@ -227,14 +255,38 @@ int main()
 
 			if (event.type == sf::Event::MouseButtonPressed && static_cast<int> (event.key.code) == static_cast<int> (sf::Mouse::Left))
 			{
-				if (bubble.button.pressed (window) && !bubble.counted)
-					count_sort_graph (bubble);
-				else if (quick.button.pressed (window) && !quick.counted)
-					count_sort_graph (quick);
-				else if (selection.button.pressed (window) && !selection.counted)
-					count_sort_graph (selection);
-				else if (gnome.button.pressed (window) && !gnome.counted)
-					count_sort_graph (gnome);
+				if (bubble.button.contain_coursor (window))
+				{
+					bubble.button.press ();
+					if (!bubble.counted) count_sort_graph (bubble);
+				}
+				else if (quick.button.contain_coursor (window))
+				{
+					quick.button.press ();
+					if (!quick.counted) count_sort_graph (quick);
+				}
+				else if (selection.button.contain_coursor (window))
+				{
+					selection.button.press ();
+					if (!selection.counted) count_sort_graph (selection);
+				}
+				else if (gnome.button.contain_coursor (window))
+				{
+					gnome.button.press ();
+					if (!gnome.counted) count_sort_graph (gnome);
+				}
+			}
+
+			if (event.type == sf::Event::MouseButtonReleased && static_cast<int> (event.key.code) == static_cast<int> (sf::Mouse::Left))
+			{
+				if (bubble.button.contain_coursor (window))
+					bubble.button.release ();
+				else if (quick.button.contain_coursor (window))
+					quick.button.release ();
+				else if (selection.button.contain_coursor (window))
+					selection.button.release ();
+				else if (gnome.button.contain_coursor (window))
+					gnome.button.release ();
 			}
 		}
 
