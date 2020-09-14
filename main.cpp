@@ -27,7 +27,7 @@ private:
 	sf::Text text;
 
 public:
-	Button (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, const char str[] = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black)
+	Button (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, const char *str = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black)
 	{
 		rectangle = sf::RectangleShape (sf::Vector2f (x_size, y_size));
 		rectangle.setFillColor (rect_color);
@@ -149,7 +149,7 @@ struct sort_algorithm
 	Graph compares_graph;
 	Graph assigns_graph;
 
-	sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, const char name[]) :
+	sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, const char *name) :
 		sort (sort_alg),
 		button (Button (button_x_pos, Graph_y_pos + 100, Button_x_side, Button_y_side, color, name, Text_size)),
 		compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color)),
