@@ -13,10 +13,10 @@ const int Rand_seed = 345234;
 const int Button_x_side = 150;
 const int Button_y_side = 70;
 const int Text_size = 35;
-const int Iterations = 5000;
+const int Iterations = 1000;
 const int Graph_length = 333;
 const int Iter_step = 50;
-const int Color_diff = 50;
+const int Color_butt_diff = 100;
 
 
 
@@ -25,9 +25,11 @@ class Button
 private:
 	sf::RectangleShape rectangle;
 	sf::Text text;
+	const int Color_diff;
 
 public:
-	Button (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, const char *str = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black)
+	Button (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, const int Color_diff, const char *str = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black) :
+		Color_diff (Color_diff)
 	{
 		rectangle = sf::RectangleShape (sf::Vector2f (x_size, y_size));
 		rectangle.setFillColor (rect_color);
@@ -111,6 +113,27 @@ public:
 		++points_num;
 	}
 
+	void draw_mouse_pos (sf::RenderWindow &window, int x, int y)
+	{
+		sf::Vector2i graph_coord = sf::Mouse::getPosition (window);
+
+		if ( min_x < graph_coord.x && graph_coord.x < max_x && max_y < graph_coord.y && graph_coord.y < min_y)
+		{
+			graph_coord.x -= x_pos;
+			graph_coord.y = y_pos - graph_coord.y;
+			graph_coord.x *= x_scale;
+			graph_coord.y *= y_scale;
+
+			sf::Font font;
+			font.loadFromFile (Text_format);
+			sf::Text coord_pair = sf::Text (std::to_string (graph_coord.x) + " ; " + std::to_string (graph_coord.y), font, Text_size);
+			//coord_pair = sf::Text ("666", font, 20);
+			coord_pair.setFillColor (sf::Color::Black);
+			coord_pair.setPosition (x, y);
+			window.draw (coord_pair);
+		}
+	}
+
 	void draw (sf::RenderWindow &window)
 	{
 		sf::RectangleShape Ox (sf::Vector2f (max_x - min_x, 1));
@@ -151,7 +174,7 @@ struct sort_algorithm
 
 	sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, const char *name) :
 		sort (sort_alg),
-		button (Button (button_x_pos, Graph_y_pos + 100, Button_x_side, Button_y_side, color, name, Text_size)),
+		button (Button (button_x_pos, Graph_y_pos + 100, Button_x_side, Button_y_side, color, Color_butt_diff, name, Text_size)),
 		compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color)),
 		assigns_graph  (Graph (Assigns_graph_x_pos,  Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color))
 	{ button_x_pos += (Button_x_side + 10); }
@@ -212,6 +235,9 @@ int main()
 	while (window.isOpen())
 	{
 		window.clear (sf::Color (255, 255, 255));
+
+		bubble.compares_graph.draw_mouse_pos (window, 100, 500);
+		bubble.assigns_graph.draw_mouse_pos  (window, 450, 500);
 
 		bubble.button.draw    (window);
 		quick.button.draw     (window);
