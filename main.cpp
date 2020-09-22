@@ -127,7 +127,6 @@ public:
 			sf::Font font;
 			font.loadFromFile (Text_format);
 			sf::Text coord_pair = sf::Text (std::to_string (graph_coord.x) + " ; " + std::to_string (graph_coord.y), font, Text_size);
-			//coord_pair = sf::Text ("666", font, 20);
 			coord_pair.setFillColor (sf::Color::Black);
 			coord_pair.setPosition (x, y);
 			window.draw (coord_pair);
@@ -145,19 +144,6 @@ public:
 		window.draw (Ox);
 		window.draw (Oy);
 		window.draw (graph);
-/*
-		sf::Font font;
-		font.loadFromFile (Text_format);
-		//sf::Text x_number = sf::Text (itoa ((max_x - x_pos) * x_scale), font, Text_size);
-		//sf::Text y_number = sf::Text (itoa ((y_pos - max_y) * y_scale), font, Text_size);
-		sf::Text x_number = sf::Text ("666", font, 20);
-		sf::Text y_number = sf::Text ("777", font, 20);
-		x_number.setFillColor (sf::Color::Black);
-		y_number.setFillColor (sf::Color::Black);
-		x_number.setPosition (x_pos + max_x - x_number.getCharacterSize () * 3, y_pos + 1);
-		y_number.setPosition (x_pos - 5, y_pos - max_y);
-		window.draw (x_number);
-		window.draw (y_number);*/
 	}
 };
 
@@ -184,9 +170,8 @@ int sort_algorithm::button_x_pos = 10;
 
 
 
-sort_counter<int> *generate_array (int size)
+sort_counter<int> *random_fill (sort_counter<int> *arr, size_t size)
 {
-	sort_counter<int> *arr = new sort_counter<int>[size];
 	srand (Rand_seed);
 
 	for (int i = 0; i < size; ++i)
@@ -201,14 +186,16 @@ void count_sort_graph (sort_algorithm &sort_alg)
 {
 	for (int i = Iter_step; i < Iterations; i += Iter_step)
 	{
-		sort_counter<int> *array = generate_array (i);
+		sort_counter<int> *array = random_fill (new sort_counter<int>[i], i);
 		sort_counter<int>::reset ();
 		sort_alg.sort (array, i);
+		delete[] array;
 		sort_alg.compares_graph.add_point (i, sort_counter<int>::compares ());
 		sort_alg.assigns_graph.add_point  (i, sort_counter<int>::assigns ());
-		sort_alg.counted = true;
-		printf("size: %d, comps: %d, assigns: %d\n", i, sort_counter<int>::compares (), sort_counter<int>::assigns ());
+		//printf("size: %d, comps: %d, assigns: %d\n", i, sort_counter<int>::compares (), sort_counter<int>::assigns ());
 	}
+	
+	sort_alg.counted = true;
 }
 
 
