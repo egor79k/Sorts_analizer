@@ -1,9 +1,11 @@
 #include <iostream>
+#include <cstring>
 #include <SFML/Graphics.hpp>
 #include "sorting_algorithms.cpp"
 #include "type_wrapper.cpp"
 
 
+sf::Font Global_font;
 const char Text_format[] = "Crystal_Regular.ttf";
 const int Compares_graph_x_pos = 5;
 const int Assigns_graph_x_pos  = 350;
@@ -12,7 +14,7 @@ const int Window_side = 700;
 const int Rand_seed = 345234;
 const int Button_x_side = 150;
 const int Button_y_side = 70;
-const int Text_size = 35;
+const int Text_size = 33;
 const int Iterations = 1000;
 const int Graph_length = 333;
 const int Iter_step = 50;
@@ -28,21 +30,34 @@ private:
 	const int Color_diff;
 
 public:
-	Button (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, const int Color_diff, const char *str = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black) :
-		Color_diff (Color_diff)
-	{
-		rectangle = sf::RectangleShape (sf::Vector2f (x_size, y_size));
-		rectangle.setFillColor (rect_color);
-		rectangle.setPosition (x_pos, y_pos);
+	void (*press_1) (...);
+	void (*release_1) (...);
 
-		static sf::Font font;
-		font.loadFromFile (Text_format);
-		text = sf::Text (str, font, text_size);
-		text.setFillColor (text_color);
-		text.setPosition (x_pos + 1, y_pos + 1);
+	Button (const sf::Vector2f &pos, const sf::Vector2f &size, const sf::Text &_text) :
+		rectangle (sf::RectangleShape (size)),
+		text (_text),
+		Color_diff (Color_butt_diff)
+	{
+		rectangle.setPosition (pos);
+
+		//static sf::Font font;
+		//font.loadFromFile (Text_format);
+		//text = sf::Text (str, font, text_size);//(x_size / strlen (str) - text.getLetterSpacing ()) * 2);
+		//text.setFillColor (text_color);
+		text.setPosition (pos.x + (size.x - text.getString ().getSize () * text.getCharacterSize () / 2) / 2, pos.y + 1);
 	}
 
-	bool contain_coursor (sf::RenderWindow &window)
+	void set_color (const sf::Color &color)
+	{
+		rectangle.setFillColor (color);
+	}
+
+	void set_text_color (const sf::Color &color)
+	{
+		text.setFillColor (color);
+	}
+
+	bool contains_coursor (sf::RenderWindow &window)
 	{
 		sf::Vector2i mouse_pos = sf::Mouse::getPosition (window);
 		return rectangle.getGlobalBounds ().contains (mouse_pos.x, mouse_pos.y);
@@ -160,10 +175,14 @@ struct sort_algorithm
 
 	sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, const char *name) :
 		sort (sort_alg),
-		button (Button (button_x_pos, Graph_y_pos + 100, Button_x_side, Button_y_side, color, Color_butt_diff, name, Text_size)),
+		button (Button (sf::Vector2f(button_x_pos, Graph_y_pos + 100), sf::Vector2f(Button_x_side, Button_y_side), sf::Text (name, Global_font, Text_size))),
 		compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color)),
 		assigns_graph  (Graph (Assigns_graph_x_pos,  Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color))
-	{ button_x_pos += (Button_x_side + 10); }
+	{
+		button_x_pos += (Button_x_side + 10);
+		button.set_color (color);
+		button.set_text_color (sf::Color::Black);
+	}
 };
 
 int sort_algorithm::button_x_pos = 10;
@@ -202,10 +221,9 @@ void count_sort_graph (sort_algorithm &sort_alg)
 
 int main()
 {
-	sf::Font font;
-	font.loadFromFile (Text_format);
-	sf::Text compares_title = sf::Text ("Compares",    font, Text_size);
-	sf::Text assigs_title   = sf::Text ("Assignments", font, Text_size);
+	Global_font.loadFromFile (Text_format);
+	sf::Text compares_title = sf::Text ("Compares",    Global_font, Text_size);
+	sf::Text assigs_title   = sf::Text ("Assignments", Global_font, Text_size);
 	compares_title.setFillColor (sf::Color::Black);
 	assigs_title.setFillColor   (sf::Color::Black);
 	compares_title.setPosition (Compares_graph_x_pos + 2, 5);
@@ -268,22 +286,22 @@ int main()
 
 			if (event.type == sf::Event::MouseButtonPressed && static_cast<int> (event.key.code) == static_cast<int> (sf::Mouse::Left))
 			{
-				if (bubble.button.contain_coursor (window))
+				if (bubble.button.contains_coursor (window))
 				{
 					bubble.button.press ();
 					if (!bubble.counted) count_sort_graph (bubble);
 				}
-				else if (quick.button.contain_coursor (window))
+				else if (quick.button.contains_coursor (window))
 				{
 					quick.button.press ();
 					if (!quick.counted) count_sort_graph (quick);
 				}
-				else if (selection.button.contain_coursor (window))
+				else if (selection.button.contains_coursor (window))
 				{
 					selection.button.press ();
 					if (!selection.counted) count_sort_graph (selection);
 				}
-				else if (gnome.button.contain_coursor (window))
+				else if (gnome.button.contains_coursor (window))
 				{
 					gnome.button.press ();
 					if (!gnome.counted) count_sort_graph (gnome);
@@ -292,13 +310,13 @@ int main()
 
 			if (event.type == sf::Event::MouseButtonReleased && static_cast<int> (event.key.code) == static_cast<int> (sf::Mouse::Left))
 			{
-				if (bubble.button.contain_coursor (window))
+				if (bubble.button.contains_coursor (window))
 					bubble.button.release ();
-				else if (quick.button.contain_coursor (window))
+				else if (quick.button.contains_coursor (window))
 					quick.button.release ();
-				else if (selection.button.contain_coursor (window))
+				else if (selection.button.contains_coursor (window))
 					selection.button.release ();
-				else if (gnome.button.contain_coursor (window))
+				else if (gnome.button.contains_coursor (window))
 					gnome.button.release ();
 			}
 		}
