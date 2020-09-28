@@ -18,7 +18,6 @@ const int Text_size = 33;
 const int Iterations = 1000;
 const int Graph_length = 333;
 const int Iter_step = 50;
-const int Color_butt_diff = 100;
 
 
 
@@ -27,23 +26,15 @@ class Button
 private:
 	sf::RectangleShape rectangle;
 	sf::Text text;
-	const int Color_diff;
+	const sf::Color Color_diff;
 
 public:
-	void (*press_1) (...);
-	void (*release_1) (...);
-
-	Button (const sf::Vector2f &pos, const sf::Vector2f &size, const sf::Text &_text) :
+	Button (const sf::Vector2f &pos, const sf::Vector2f &size, const sf::Text &_text, const sf::Color &color_diff) :
 		rectangle (sf::RectangleShape (size)),
 		text (_text),
-		Color_diff (Color_butt_diff)
+		Color_diff (color_diff)
 	{
 		rectangle.setPosition (pos);
-
-		//static sf::Font font;
-		//font.loadFromFile (Text_format);
-		//text = sf::Text (str, font, text_size);//(x_size / strlen (str) - text.getLetterSpacing ()) * 2);
-		//text.setFillColor (text_color);
 		text.setPosition (pos.x + (size.x - text.getString ().getSize () * text.getCharacterSize () / 2) / 2, pos.y + 1);
 	}
 
@@ -65,16 +56,18 @@ public:
 
 	void press ()
 	{
-		if (rectangle.getFillColor ().r >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r - Color_diff, rectangle.getFillColor ().g, rectangle.getFillColor ().b));
-		if (rectangle.getFillColor ().g >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g - Color_diff, rectangle.getFillColor ().b));
-		if (rectangle.getFillColor ().b >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g, rectangle.getFillColor ().b - Color_diff));
+		rectangle.setFillColor (rectangle.getFillColor () - Color_diff);
+		//if (rectangle.getFillColor ().r >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r - Color_diff, rectangle.getFillColor ().g, rectangle.getFillColor ().b));
+		//if (rectangle.getFillColor ().g >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g - Color_diff, rectangle.getFillColor ().b));
+		//if (rectangle.getFillColor ().b >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g, rectangle.getFillColor ().b - Color_diff));
 	}
 
 	void release ()
 	{
-		if (rectangle.getFillColor ().r <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r + Color_diff, rectangle.getFillColor ().g, rectangle.getFillColor ().b));
-		if (rectangle.getFillColor ().g <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g + Color_diff, rectangle.getFillColor ().b));
-		if (rectangle.getFillColor ().b <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g, rectangle.getFillColor ().b + Color_diff));
+		rectangle.setFillColor (rectangle.getFillColor () + Color_diff);
+		//if (rectangle.getFillColor ().r <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r + Color_diff, rectangle.getFillColor ().g, rectangle.getFillColor ().b));
+		//if (rectangle.getFillColor ().g <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g + Color_diff, rectangle.getFillColor ().b));
+		//if (rectangle.getFillColor ().b <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g, rectangle.getFillColor ().b + Color_diff));
 	}
 
 	void draw (sf::RenderWindow &window)
@@ -175,7 +168,7 @@ struct sort_algorithm
 
 	sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, const char *name) :
 		sort (sort_alg),
-		button (Button (sf::Vector2f(button_x_pos, Graph_y_pos + 100), sf::Vector2f(Button_x_side, Button_y_side), sf::Text (name, Global_font, Text_size))),
+		button (Button (sf::Vector2f(button_x_pos, Graph_y_pos + 100), sf::Vector2f(Button_x_side, Button_y_side), sf::Text (name, Global_font, Text_size), sf::Color (0, 0, 0))),
 		compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color)),
 		assigns_graph  (Graph (Assigns_graph_x_pos,  Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color))
 	{
