@@ -20,7 +20,42 @@ const int Color_butt_diff = 100;
 
 
 
-class Button
+class AbstructButton
+{
+private:
+	sf::Shape shape;
+	sf::Text  text;
+
+protected:
+	Button () {}
+
+public:
+	virtual ~Button () = 0;
+
+	template <typename T>
+	bool contains (T x, T y) const
+	{
+		return shape.getGlobalBounds ().contains (x, y);
+	}
+
+	template <typename T>
+	bool contains (sf::Vector2<T> coord) const
+	{
+		return shape.getGlobalBounds ().contains (coord);
+	}
+
+	void draw (sf::RenderWindow &window) const
+	{
+		window.draw (rectangle);
+		window.draw (text);
+	}
+
+	virtual void action () {}
+};
+
+
+
+class SortButton : public AbstructButton
 {
 private:
 	sf::RectangleShape rectangle;
@@ -28,7 +63,7 @@ private:
 	const int Color_diff;
 
 public:
-	Button (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, const int Color_diff, const char *str = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black) :
+	SortButton (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, const int Color_diff, const char *str = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black) :
 		Color_diff (Color_diff)
 	{
 		rectangle = sf::RectangleShape (sf::Vector2f (x_size, y_size));
@@ -154,13 +189,13 @@ struct sort_algorithm
 	static int button_x_pos;
 	bool counted = false;
 	void (*sort) (sort_counter<int> *, size_t);
-	Button button;
+	SortButton button;
 	Graph compares_graph;
 	Graph assigns_graph;
 
 	sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, const char *name) :
 		sort (sort_alg),
-		button (Button (button_x_pos, Graph_y_pos + 100, Button_x_side, Button_y_side, color, Color_butt_diff, name, Text_size)),
+		button (SortButton (button_x_pos, Graph_y_pos + 100, Button_x_side, Button_y_side, color, Color_butt_diff, name, Text_size)),
 		compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color)),
 		assigns_graph  (Graph (Assigns_graph_x_pos,  Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color))
 	{ button_x_pos += (Button_x_side + 10); }
