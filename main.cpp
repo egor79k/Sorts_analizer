@@ -58,8 +58,6 @@ public:
 class SortButton : public AbstructButton
 {
 private:
-	sf::RectangleShape rectangle;
-	sf::Text text;
 	const int Color_diff;
 
 public:
