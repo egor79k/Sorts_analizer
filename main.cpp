@@ -21,9 +21,45 @@ const int Iter_step = 50;
 
 
 
-class Button
+class AbstructButton
 {
 private:
+	sf::Shape shape;
+	sf::Text  text;
+
+protected:
+	Button () {}
+
+public:
+	virtual ~Button () = 0;
+
+	template <typename T>
+	bool contains (T x, T y) const
+	{
+		return shape.getGlobalBounds ().contains (x, y);
+	}
+
+	template <typename T>
+	bool contains (sf::Vector2<T> coord) const
+	{
+		return shape.getGlobalBounds ().contains (coord);
+	}
+
+	void draw (sf::RenderWindow &window) const
+	{
+		window.draw (rectangle);
+		window.draw (text);
+	}
+
+	virtual void action () {}
+};
+
+
+
+class SortButton : public AbstructButton
+{
+private:
+<<<<<<< HEAD
 	sf::RectangleShape rectangle;
 	sf::Text text;
 	const sf::Color Color_diff;
@@ -33,6 +69,13 @@ public:
 		rectangle (sf::RectangleShape (size)),
 		text (_text),
 		Color_diff (color_diff)
+=======
+	const int Color_diff;
+
+public:
+	SortButton (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, const int Color_diff, const char *str = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black) :
+		Color_diff (Color_diff)
+>>>>>>> 0e5ce2986da3cbf8e7d085fc20bab9dfd660908b
 	{
 		rectangle.setPosition (pos);
 		text.setPosition (pos.x + (size.x - text.getString ().getSize () * text.getCharacterSize () / 2) / 2, pos.y + 1);
@@ -162,13 +205,17 @@ struct sort_algorithm
 	static int button_x_pos;
 	bool counted = false;
 	void (*sort) (sort_counter<int> *, size_t);
-	Button button;
+	SortButton button;
 	Graph compares_graph;
 	Graph assigns_graph;
 
 	sort_algorithm (void (*sort_alg) (sort_counter<int> *, size_t), const sf::Color &color, const char *name) :
 		sort (sort_alg),
+<<<<<<< HEAD
 		button (Button (sf::Vector2f(button_x_pos, Graph_y_pos + 100), sf::Vector2f(Button_x_side, Button_y_side), sf::Text (name, Global_font, Text_size), sf::Color (0, 0, 0))),
+=======
+		button (SortButton (button_x_pos, Graph_y_pos + 100, Button_x_side, Button_y_side, color, Color_butt_diff, name, Text_size)),
+>>>>>>> 0e5ce2986da3cbf8e7d085fc20bab9dfd660908b
 		compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color)),
 		assigns_graph  (Graph (Assigns_graph_x_pos,  Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color))
 	{
