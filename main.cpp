@@ -19,23 +19,20 @@ const int Iterations = 1000;
 const int Graph_length = 333;
 const int Iter_step = 50;
 
-
-
+/*
 class AbstractButton
 {
 private:
 	sf::Shape &shape;
-	sf::Text  text;
-
-//protected:
-
+	sf::Text text;
 public:
-	AbstractButton (sf::Shape &_shape, sf::Text &_text) :
+	AbstractButton (sf::RectangleShape &_shape, const sf::Text &_text) :
 		shape (_shape),
 		text (_text)
 	{}
-	//virtual ~AbstractButton () = 0;
-/*
+
+	virtual ~AbstractButton () = 0;
+
 	template <typename T>
 	bool contains (T x, T y) const
 	{
@@ -50,28 +47,119 @@ public:
 
 	void draw (sf::RenderWindow &window) const
 	{
+		window.draw (shape);
+		window.draw (text);
+	}
+};
+
+AbstractButton::~AbstractButton () {}
+
+class SortButton : public AbstractButton
+{
+public:
+	SortButton (sf::RectangleShape rectangle, const sf::Text &text) :
+		AbstractButton (rectangle, text)
+	{}
+
+	~SortButton () {}
+};
+
+
+int main ()
+{
+	SortButton butt (sf::RectangleShape (sf::Vector2f (200, 100)), sf::Text ("temp butt", Global_font, Text_size));
+	sf::RenderWindow window(sf::VideoMode (Window_side, Window_side), "Sorts analizer");
+
+	while (window.isOpen())
+	{
+		window.clear (sf::Color (255, 255, 255));
+
+		butt.draw (window);
+
+		sf::Event event;
+		
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+
+		window.display();
+	}
+ 
+	return 0;
+}
+*/
+
+
+class AbstractButton
+{
+private:
+	sf::RectangleShape rectangle;
+	sf::Text text;
+
+public:
+	AbstractButton (const sf::RectangleShape &_rectangle, const sf::Text &_text) :
+		rectangle (_rectangle),
+		text (_text)
+	{}
+
+	virtual ~AbstractButton () = 0;
+
+	void setPosition (const sf::Vector2f &pos)
+	{
+		rectangle.setPosition (pos);
+		text.setPosition (pos.x + (rectangle.getSize ().x - text.getString ().getSize () * text.getCharacterSize () / 2) / 2, pos.y + 1);
+	}
+
+	void set_color (const sf::Color &color)
+	{
+		rectangle.setFillColor (color);
+	}
+
+	void set_text_color (const sf::Color &color)
+	{
+		text.setFillColor (color);
+	}
+
+	template <typename T>
+	bool contains (T x, T y) const
+	{
+		return rectangle.getGlobalBounds ().contains (x, y);
+	}
+
+	bool contains (sf::Vector2f &coord) const
+	{
+		return rectangle.getGlobalBounds ().contains (coord);
+	}
+
+	void draw (sf::RenderWindow &window) const
+	{
 		window.draw (rectangle);
 		window.draw (text);
 	}
-*/
-	virtual void action () = 0;
+
+	//virtual void action () = 0;
 };
+
+AbstractButton::~AbstractButton () {}
 
 
 
 class SortButton : public AbstractButton
 {
 private:
-	//sf::RectangleShape rectangle;
+	//sf::Rectanglerectangle rectangle;
 	//sf::Text text;
 	const sf::Color Color_diff;
 
 public:
 	SortButton (const sf::Vector2f &pos, const sf::Vector2f &size, const sf::Text &_text, const sf::Color &color_diff) :
-		AbstractButton (static_cast<sf::Shape&>(sf::RectangleShape (size)), _text),
-		//text (_text),
+		AbstractButton (sf::RectangleShape (size), _text),
 		Color_diff (color_diff)
-	{}
+	{
+		setPosition (pos);
+	}
 /*
 	SortButton (int x_pos, int y_pos, float x_size, float y_size, const sf::Color &rect_color, const int Color_diff, const char *str = "", int text_size = 20, const sf::Color &text_color = sf::Color::Black) :
 		Color_diff (Color_diff)
@@ -79,10 +167,10 @@ public:
 		rectangle.setPosition (pos);
 		text.setPosition (pos.x + (size.x - text.getString ().getSize () * text.getCharacterSize () / 2) / 2, pos.y + 1);
 	}
-*/
+
 	void set_color (const sf::Color &color)
 	{
-		shape.setFillColor (color);
+		rectangle.setFillColor (color);
 	}
 
 	void set_text_color (const sf::Color &color)
@@ -93,30 +181,30 @@ public:
 	bool contains_coursor (sf::RenderWindow &window)
 	{
 		sf::Vector2i mouse_pos = sf::Mouse::getPosition (window);
-		return shape.getGlobalBounds ().contains (mouse_pos.x, mouse_pos.y);
+		return rectangle.getGlobalBounds ().contains (mouse_pos.x, mouse_pos.y);
 	}
 
 	void press ()
 	{
-		shape.setFillColor (shape.getFillColor () - Color_diff);
-		//if (shape.getFillColor ().r >= Color_diff) shape.setFillColor (sf::Color (shape.getFillColor ().r - Color_diff, shape.getFillColor ().g, shape.getFillColor ().b));
-		//if (shape.getFillColor ().g >= Color_diff) shape.setFillColor (sf::Color (shape.getFillColor ().r, shape.getFillColor ().g - Color_diff, shape.getFillColor ().b));
-		//if (shape.getFillColor ().b >= Color_diff) shape.setFillColor (sf::Color (shape.getFillColor ().r, shape.getFillColor ().g, shape.getFillColor ().b - Color_diff));
+		rectangle.setFillColor (rectangle.getFillColor () - Color_diff);
+		//if (rectangle.getFillColor ().r >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r - Color_diff, rectangle.getFillColor ().g, rectangle.getFillColor ().b));
+		//if (rectangle.getFillColor ().g >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g - Color_diff, rectangle.getFillColor ().b));
+		//if (rectangle.getFillColor ().b >= Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g, rectangle.getFillColor ().b - Color_diff));
 	}
 
 	void release ()
 	{
-		shape.setFillColor (shape.getFillColor () + Color_diff);
-		//if (shape.getFillColor ().r <= 255 - Color_diff) shape.setFillColor (sf::Color (shape.getFillColor ().r + Color_diff, shape.getFillColor ().g, shape.getFillColor ().b));
-		//if (shape.getFillColor ().g <= 255 - Color_diff) shape.setFillColor (sf::Color (shape.getFillColor ().r, shape.getFillColor ().g + Color_diff, shape.getFillColor ().b));
-		//if (shape.getFillColor ().b <= 255 - Color_diff) shape.setFillColor (sf::Color (shape.getFillColor ().r, shape.getFillColor ().g, shape.getFillColor ().b + Color_diff));
+		rectangle.setFillColor (rectangle.getFillColor () + Color_diff);
+		//if (rectangle.getFillColor ().r <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r + Color_diff, rectangle.getFillColor ().g, rectangle.getFillColor ().b));
+		//if (rectangle.getFillColor ().g <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g + Color_diff, rectangle.getFillColor ().b));
+		//if (rectangle.getFillColor ().b <= 255 - Color_diff) rectangle.setFillColor (sf::Color (rectangle.getFillColor ().r, rectangle.getFillColor ().g, rectangle.getFillColor ().b + Color_diff));
 	}
 
 	void draw (sf::RenderWindow &window)
 	{
-		window.draw (shape);
+		window.draw (rectangle);
 		window.draw (text);
-	}
+	}*/
 };
 
 
@@ -321,28 +409,30 @@ int main()
 
 			if (event.type == sf::Event::MouseButtonPressed && static_cast<int> (event.key.code) == static_cast<int> (sf::Mouse::Left))
 			{
-				if (bubble.button.contains_coursor (window))
+				sf::Vector2i mouse_pos = sf::Mouse::getPosition (window);
+
+				if (bubble.button.contains (mouse_pos.x, mouse_pos.y))
 				{
-					bubble.button.press ();
+					//bubble.button.press ();
 					if (!bubble.counted) count_sort_graph (bubble);
 				}
-				else if (quick.button.contains_coursor (window))
+				else if (quick.button.contains (mouse_pos.x, mouse_pos.y))
 				{
-					quick.button.press ();
+					//quick.button.press ();
 					if (!quick.counted) count_sort_graph (quick);
 				}
-				else if (selection.button.contains_coursor (window))
+				else if (selection.button.contains (mouse_pos.x, mouse_pos.y))
 				{
-					selection.button.press ();
+					//selection.button.press ();
 					if (!selection.counted) count_sort_graph (selection);
 				}
-				else if (gnome.button.contains_coursor (window))
+				else if (gnome.button.contains (mouse_pos.x, mouse_pos.y))
 				{
-					gnome.button.press ();
+					//gnome.button.press ();
 					if (!gnome.counted) count_sort_graph (gnome);
 				}
 			}
-
+/*
 			if (event.type == sf::Event::MouseButtonReleased && static_cast<int> (event.key.code) == static_cast<int> (sf::Mouse::Left))
 			{
 				if (bubble.button.contains_coursor (window))
@@ -353,7 +443,7 @@ int main()
 					selection.button.release ();
 				else if (gnome.button.contains_coursor (window))
 					gnome.button.release ();
-			}
+			}*/
 		}
 
 		window.display();
