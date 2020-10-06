@@ -179,12 +179,10 @@ public:
 		Color_diff (color_diff)
 	{}
 
-	void set_position (const sf::Vector2f &pos)
+	void action ()
 	{
-		AbstractButton::set_position (pos);
+		printf ("Sort Action\n");
 	}
-
-	void action () {printf ("Sort Action\n");}
 	
 	void press ()
 	{
@@ -195,12 +193,21 @@ public:
 	{
 		set_fill_color (get_fill_color () + Color_diff);
 	}
-	
-	/*void draw (sf::RenderWindow &window)
+};
+
+
+
+class ClearButton : public AbstractButton
+{
+public:
+	ClearButton () :
+		AbstractButton (sf::RectangleShape (sf::Vector2f (25, 25)), sf::Text ("X", Global_font, 40))
+	{}
+
+	void action ()
 	{
-		window.draw (rectangle);
-		window.draw (text);
-	}*/
+		printf ("Clear Action\n");
+	}
 };
 
 
@@ -278,11 +285,34 @@ int main()
 
 	sf::RenderWindow window(sf::VideoMode (Window_side, Window_side), "Sorts analizer");
 
+	//=================
+	// Temp realization
+	const int sorts_num = 4;
+	AbstractButton *buttons[5] = {};
+	SortButton sort_buttons[sorts_num] = {
+		SortButton (bubble_sort,    sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Bubble",    Global_font, Text_size), sf::Color (0, 0, 0)),
+		SortButton (quick_sort,     sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Quick",     Global_font, Text_size), sf::Color (0, 0, 0)),
+		SortButton (selection_sort, sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Selection", Global_font, Text_size), sf::Color (0, 0, 0)),
+		SortButton (gnome_sort,     sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Gnome",     Global_font, Text_size), sf::Color (0, 0, 0))
+	};
+	
+	int button_x_pos = 10;
+	for (int i = 0; i < sorts_num; ++i)
+	{
+		sort_buttons[i].set_fill_color (sf::Color::Yellow);
+		sort_buttons[i].set_text_color (sf::Color::Black);
+		sort_buttons[i].set_position (sf::Vector2f(button_x_pos, Graph_y_pos + 50));
+		button_x_pos += (Button_x_side + 10);
+		buttons[i] = &sort_buttons[i];
+	}
 
-	/*SortButton sort_butt = SortButton (sf::Vector2f(0, 0), sf::Vector2f(Button_x_side, Button_y_side), sf::Text ("Test", Global_font, Text_size), sf::Color (0, 0, 0));
-	AbstractButton *abstr_butt = &sort_butt;
-	sort_butt.action ();
-	abstr_butt->action ();*/
+	ClearButton clear_butt ();
+	clear_butt.set_fill_color (sf::Color::Yellow);
+	clear_butt.set_text_color (sf::Color::Black);
+	clear_butt.set_position (sf::Vector2f(5, Graph_y_pos + 20));
+	buttons[sorts_num + 1] = &clear_butt;
+	// Temp realization
+	//=================
 
 
 	while (window.isOpen())
@@ -296,6 +326,9 @@ int main()
 		quick.button.draw     (window);
 		selection.button.draw (window);
 		gnome.button.draw     (window);
+
+		for (int i = 0; i < sorts_num + 1; ++i)
+			buttons[i]->draw (window);
 
 		window.draw (compares_title);
 		window.draw (assigs_title);
