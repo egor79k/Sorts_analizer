@@ -201,7 +201,7 @@ class ClearButton : public AbstractButton
 {
 public:
 	ClearButton () :
-		AbstractButton (sf::RectangleShape (sf::Vector2f (25, 25)), sf::Text ("X", Global_font, 40))
+		AbstractButton (sf::RectangleShape (sf::Vector2f (50, 50)), sf::Text ("X", Global_font, 40))
 	{}
 
 	void action ()
@@ -306,11 +306,12 @@ int main()
 		buttons[i] = &sort_buttons[i];
 	}
 
-	ClearButton clear_butt ();
+	const int buttons_num = sorts_num + 1;
+	ClearButton clear_butt;
 	clear_butt.set_fill_color (sf::Color::Yellow);
 	clear_butt.set_text_color (sf::Color::Black);
 	clear_butt.set_position (sf::Vector2f(5, Graph_y_pos + 20));
-	buttons[sorts_num + 1] = &clear_butt;
+	buttons[sorts_num] = &clear_butt;
 	// Temp realization
 	//=================
 
@@ -327,7 +328,7 @@ int main()
 		selection.button.draw (window);
 		gnome.button.draw     (window);
 
-		for (int i = 0; i < sorts_num + 1; ++i)
+		for (int i = 0; i < buttons_num; ++i)
 			buttons[i]->draw (window);
 
 		window.draw (compares_title);
@@ -371,6 +372,15 @@ int main()
 				
 				if (event.type == sf::Event::MouseButtonPressed)
 				{
+					for (int i = 0; i < buttons_num; ++i)
+					{
+						if (buttons[i]->contains (mouse_pos.x, mouse_pos.y))
+						{
+							buttons[i]->action ();
+							break;
+						}
+					}
+
 					if (bubble.button.contains (mouse_pos.x, mouse_pos.y))
 					{
 						bubble.button.press ();
