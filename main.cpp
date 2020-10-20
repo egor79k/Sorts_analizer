@@ -95,6 +95,11 @@ public:
 		window.draw (Oy);
 		window.draw (graph);
 	}
+
+	void clear ()
+	{
+		graph.clear ();
+	}
 };
 
 
@@ -165,8 +170,7 @@ class SortButton : public AbstractButton
 {
 private:
 	typedef void(*sort_function_ptr)(sort_counter<int>*,size_t);
-	//bool counted = false;
-	//void (*sort) (sort_counter<int> *, size_t);
+	bool counted = false;
 	sort_function_ptr sort;
 	//Graph compares_graph;
 	//Graph assigns_graph;
@@ -174,9 +178,11 @@ private:
 
 public:
 	SortButton (sort_function_ptr _sort, const sf::Vector2f &size, const sf::Text &_text, const sf::Color &color_diff) :
-		sort (_sort),
 		AbstractButton (sf::RectangleShape (size), _text),
+		sort (_sort),
 		Color_diff (color_diff)
+		//compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color)),
+		//assigns_graph  (Graph (Assigns_graph_x_pos,  Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color))
 	{}
 
 	void action ()
