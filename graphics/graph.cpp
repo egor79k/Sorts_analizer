@@ -48,7 +48,7 @@ void Graph::draw_mouse_pos (sf::RenderWindow &window, int x, int y)
 }
 
 
-void Graph::draw (sf::RenderWindow &window)
+void Graph::draw (sf::RenderWindow &window) const
 {
 	sf::RectangleShape Ox (sf::Vector2f (max_x - min_x, 1));
 	sf::RectangleShape Oy (sf::Vector2f (1, min_y - max_y));

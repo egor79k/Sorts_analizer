@@ -29,7 +29,7 @@ public:
 
 	void draw_mouse_pos (sf::RenderWindow &window, int x, int y);
 
-	void draw (sf::RenderWindow &window);
+	void draw (sf::RenderWindow &window) const;
 
 	void clear ();
 };

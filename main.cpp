@@ -24,6 +24,16 @@ const int Graph_length = 333;
 const int Iter_step = 50;
 
 
+sort_counter<int> *random_fill (sort_counter<int> *arr, size_t size)
+{
+	srand (Rand_seed);
+
+	for (int i = 0; i < size; ++i)
+		arr[i] = sort_counter<int> (rand () % RAND_MAX);
+
+	return arr;
+}
+
 
 class SortButton : public Button
 {
@@ -124,17 +134,6 @@ struct sort_algorithm
 
 int sort_algorithm::button_x_pos = 10;
 
-
-
-sort_counter<int> *random_fill (sort_counter<int> *arr, size_t size)
-{
-	srand (Rand_seed);
-
-	for (int i = 0; i < size; ++i)
-		arr[i] = sort_counter<int> (rand () % RAND_MAX);
-
-	return arr;
-}
 
 
 
