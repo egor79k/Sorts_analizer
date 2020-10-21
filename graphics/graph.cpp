@@ -64,5 +64,10 @@ void Graph::draw (sf::RenderWindow &window) const
 
 void Graph::clear ()
 {
+	max_x = x_pos;
+	max_y = y_pos;
+	min_x = x_pos;
+	min_y = y_pos;
+	points_num = 0;
 	graph.clear ();
 }

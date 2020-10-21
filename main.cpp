@@ -56,7 +56,10 @@ public:
 
 	void action ()
 	{
-		printf ("Sort Action\n");
+		if (counted)
+			return;
+
+		//printf ("Sort Action\n");
 		for (int i = Iter_step; i < Iterations; i += Iter_step)
 		{
 			sort_counter<int> *array = random_fill (new sort_counter<int>[i], i);
@@ -90,26 +93,37 @@ public:
 	{
 		set_fill_color (get_fill_color () + Color_diff);
 	}
+
+	void clear ()
+	{
+		compares_graph.clear ();
+		assigns_graph.clear ();
+		counted = false;
+	}
 };
 
 
 
 class ClearButton : public Button
 {
+private:
+	std::vector<SortButton *> sort_buttons;
 public:
-	ClearButton () :
-		Button (sf::RectangleShape (sf::Vector2f (50, 50)), sf::Text ("X", Global_font, 40))
+	ClearButton (std::vector<SortButton *> &buttons) :
+		Button (sf::RectangleShape (sf::Vector2f (50, 50)), sf::Text ("X", Global_font, 40)),
+		sort_buttons (buttons)
 	{}
 
 	void action ()
 	{
-		printf ("Clear Action\n");
-
+		//printf ("Clear Action\n");
+		for (int i = 0; i < sort_buttons.size (); ++i)
+			sort_buttons[i]->clear ();
 	}
 };
 
 
-
+/*
 struct sort_algorithm
 {
 	static int button_x_pos;
@@ -152,7 +166,7 @@ void count_sort_graph (sort_algorithm &sort_alg)
 	
 	sort_alg.counted = true;
 }
-
+*/
 
 
 int main()
@@ -167,6 +181,7 @@ int main()
 		SortButton (gnome_sort,     sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Gnome",     Global_font, Text_size), sf::Color (0, 0, 0))
 	};
 	
+	std::vector<SortButton *> clearable_buttons;
 	int button_x_pos = 10;
 	for (int i = 0; i < sorts_num; ++i)
 	{
@@ -175,9 +190,10 @@ int main()
 		sort_buttons[i].set_position (sf::Vector2f(button_x_pos, Graph_y_pos + 50));
 		button_x_pos += (Button_x_side + 10);
 		sorts_analizer.add_button (&sort_buttons[i]);
+		clearable_buttons.push_back (&sort_buttons[i]);
 	}
 
-	ClearButton clear_butt;
+	ClearButton clear_butt (clearable_buttons);
 	clear_butt.set_fill_color (sf::Color::Yellow);
 	clear_butt.set_text_color (sf::Color::Black);
 	clear_butt.set_position (sf::Vector2f(5, Graph_y_pos + 20));
