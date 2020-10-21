@@ -1,3 +1,8 @@
+#ifndef BUTTON_HPP
+#define BUTTON_HPP
+
+#include <SFML/Graphics.hpp>
+
 class Button
 {
 private:
@@ -15,12 +20,13 @@ public:
 
 	void set_text_color (const sf::Color &color);
 
-	template <typename T>
-	bool contains (T x, T y) const;
+	bool contains (int x, int y) const;
 
 	bool contains (sf::Vector2f &coord) const;
 
-	void draw (sf::RenderWindow &window) const;
+	virtual void draw (sf::RenderWindow &window) const;
 	
 	virtual void action ();
 };
+
+#endif

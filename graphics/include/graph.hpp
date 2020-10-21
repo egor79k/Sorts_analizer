@@ -1,3 +1,7 @@
+#ifndef GRAPH_HPP
+#define GRAPH_HPP
+
+#include <SFML/Graphics.hpp>
 
 const char Default_text_format[] = "graphics/include/Crystal_Regular.ttf";
 const int Default_text_size = 33;
@@ -29,3 +33,5 @@ public:
 
 	void clear ();
 };
+
+#endif

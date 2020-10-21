@@ -1,3 +1,4 @@
+#include <iostream>
 #include "include/button.hpp"
 
 
@@ -32,8 +33,7 @@ void Button::set_text_color (const sf::Color &color)
 }
 
 
-template <typename T>
-bool Button::contains (T x, T y) const
+bool Button::contains (int x, int y) const
 {
 	return rectangle.getGlobalBounds ().contains (x, y);
 }

@@ -3,16 +3,18 @@
 #include <SFML/Graphics.hpp>
 #include "sorting_algorithms.cpp"
 #include "type_wrapper.cpp"
-#include "graphics/button.cpp"
-#include "graphics/graph.cpp"
+#include "graphics/include/application.hpp"
+#include "graphics/include/button.hpp"
+#include "graphics/include/graph.hpp"
 
 
 sf::Font Global_font;
 const char Text_format[] = "graphics/include/Crystal_Regular.ttf";
+const char Window_name[] = "Sorts analizer";
+const int Window_side = 700;
 const int Compares_graph_x_pos = 5;
 const int Assigns_graph_x_pos  = 350;
 const int Graph_y_pos = 500;
-const int Window_side = 700;
 const int Rand_seed = 345234;
 const int Button_x_side = 150;
 const int Button_y_side = 70;
@@ -45,6 +47,28 @@ public:
 	void action ()
 	{
 		printf ("Sort Action\n");
+		for (int i = Iter_step; i < Iterations; i += Iter_step)
+		{
+			sort_counter<int> *array = random_fill (new sort_counter<int>[i], i);
+			sort_counter<int>::reset ();
+			sort (array, i);
+			delete[] array;
+			compares_graph.add_point (i, sort_counter<int>::compares ());
+			assigns_graph.add_point  (i, sort_counter<int>::assigns ());
+			//printf("size: %d, comps: %d, assigns: %d\n", i, sort_counter<int>::compares (), sort_counter<int>::assigns ());
+		}
+		
+		counted = true;
+	}
+
+	void draw (sf::RenderWindow &window) const
+	{
+		Button::draw (window);
+		if (counted)
+		{
+			compares_graph.draw (window);
+			assigns_graph.draw  (window);
+		}
 	}
 	
 	void press ()
@@ -70,6 +94,7 @@ public:
 	void action ()
 	{
 		printf ("Clear Action\n");
+
 	}
 };
 
@@ -133,10 +158,9 @@ void count_sort_graph (sort_algorithm &sort_alg)
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode (Window_side, Window_side), "Sorts analizer");
+	Application sorts_analizer (Window_side, Window_side, Window_name);
 
 	const int sorts_num = 4;
-	Button *buttons[5] = {};
 	SortButton sort_buttons[sorts_num] = {
 		SortButton (bubble_sort,    sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Bubble",    Global_font, Text_size), sf::Color (0, 0, 0)),
 		SortButton (quick_sort,     sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Quick",     Global_font, Text_size), sf::Color (0, 0, 0)),
@@ -151,51 +175,16 @@ int main()
 		sort_buttons[i].set_text_color (sf::Color::Black);
 		sort_buttons[i].set_position (sf::Vector2f(button_x_pos, Graph_y_pos + 50));
 		button_x_pos += (Button_x_side + 10);
-		buttons[i] = &sort_buttons[i];
+		sorts_analizer.add_button (&sort_buttons[i]);
 	}
 
-	const int buttons_num = sorts_num + 1;
 	ClearButton clear_butt;
 	clear_butt.set_fill_color (sf::Color::Yellow);
 	clear_butt.set_text_color (sf::Color::Black);
 	clear_butt.set_position (sf::Vector2f(5, Graph_y_pos + 20));
-	buttons[sorts_num] = &clear_butt;
+	sorts_analizer.add_button (&clear_butt);
 
-	while (window.isOpen ())
-	{
-		window.clear (sf::Color (255, 255, 255));
-
-		for (int i = 0; i < buttons_num; ++i)
-			buttons[i]->draw (window);
-
-		sf::Event event;
-
-		while (window.pollEvent (event))
-		{
-			if (event.type == sf::Event::Closed)
-				window.close ();
-
-			if (static_cast<int> (event.key.code) == static_cast<int> (sf::Mouse::Left))
-			{
-				sf::Vector2i mouse_pos = sf::Mouse::getPosition (window);
-				
-				if (event.type == sf::Event::MouseButtonPressed)
-				{
-					for (int i = 0; i < buttons_num; ++i)
-					{
-						if (buttons[i]->contains (mouse_pos.x, mouse_pos.y))
-						{
-							buttons[i]->action ();
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		window.display ();
-	}
-
+	sorts_analizer.run ();
 
 /*
 	Global_font.loadFromFile (Text_format);
