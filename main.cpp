@@ -22,89 +22,6 @@ const int Graph_length = 333;
 const int Iter_step = 50;
 
 
-/*
-class Graph
-{
-private:
-	const float x_pos;
-	const float y_pos;
-	const float x_scale;
-	const float y_scale;
-	float max_x;
-	float max_y;
-	float min_x;
-	float min_y;
-	uint32_t points_num;
-	sf::Color color;
-	sf::VertexArray graph;
-
-
-public:
-	Graph (float x, float y, float x_sc = 1, float y_sc = 1, const sf::Color &col = sf::Color::Black) :
-		x_pos (x),
-		y_pos (y),
-		x_scale (x_sc),
-		y_scale (y_sc),
-		max_x (x),
-		max_y (y),
-		min_x (x),
-		min_y (y),
-		points_num (0),
-		color (col),
-		graph (sf::VertexArray (sf::LineStrip))
-	{}
-
-	void add_point (float x, float y)
-	{
-		graph.append (sf::Vector2f (x_pos + x / x_scale, y_pos - y / y_scale));
-		if (graph[points_num].position.x > max_x) max_x = graph[points_num].position.x;
-		if (graph[points_num].position.y < max_y) max_y = graph[points_num].position.y;
-		if (graph[points_num].position.x < min_x) min_x = graph[points_num].position.x;
-		if (graph[points_num].position.y > min_y) min_y = graph[points_num].position.y;
-		graph[points_num].color = color;
-		++points_num;
-	}
-
-	void draw_mouse_pos (sf::RenderWindow &window, int x, int y)
-	{
-		sf::Vector2i graph_coord = sf::Mouse::getPosition (window);
-
-		if ( min_x < graph_coord.x && graph_coord.x < max_x && max_y < graph_coord.y && graph_coord.y < min_y)
-		{
-			graph_coord.x -= x_pos;
-			graph_coord.y = y_pos - graph_coord.y;
-			graph_coord.x *= x_scale;
-			graph_coord.y *= y_scale;
-
-			sf::Font font;
-			font.loadFromFile (Text_format);
-			sf::Text coord_pair = sf::Text (std::to_string (graph_coord.x) + " ; " + std::to_string (graph_coord.y), font, Text_size);
-			coord_pair.setFillColor (sf::Color::Black);
-			coord_pair.setPosition (x, y);
-			window.draw (coord_pair);
-		}
-	}
-
-	void draw (sf::RenderWindow &window)
-	{
-		sf::RectangleShape Ox (sf::Vector2f (max_x - min_x, 1));
-		sf::RectangleShape Oy (sf::Vector2f (1, min_y - max_y));
-		Ox.setPosition (min_x, y_pos);
-		Oy.setPosition (x_pos, max_y);
-		Ox.setFillColor (sf::Color::Black);
-		Oy.setFillColor (sf::Color::Black);
-		window.draw (Ox);
-		window.draw (Oy);
-		window.draw (graph);
-	}
-
-	void clear ()
-	{
-		graph.clear ();
-	}
-};*/
-
-
 
 class SortButton : public Button
 {
@@ -112,17 +29,17 @@ private:
 	typedef void(*sort_function_ptr)(sort_counter<int>*,size_t);
 	bool counted = false;
 	sort_function_ptr sort;
-	//Graph compares_graph;
-	//Graph assigns_graph;
+	Graph compares_graph;
+	Graph assigns_graph;
 	const sf::Color Color_diff;
 
 public:
 	SortButton (sort_function_ptr _sort, const sf::Vector2f &size, const sf::Text &_text, const sf::Color &color_diff) :
 		Button (sf::RectangleShape (size), _text),
 		sort (_sort),
-		Color_diff (color_diff)
-		//compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color)),
-		//assigns_graph  (Graph (Assigns_graph_x_pos,  Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3), color))
+		Color_diff (color_diff),
+		compares_graph (Graph (Compares_graph_x_pos, Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3))),
+		assigns_graph  (Graph (Assigns_graph_x_pos,  Graph_y_pos, Iterations / Graph_length, (Iterations * Iterations) / (Graph_y_pos * 3)))
 	{}
 
 	void action ()
@@ -216,6 +133,71 @@ void count_sort_graph (sort_algorithm &sort_alg)
 
 int main()
 {
+	sf::RenderWindow window(sf::VideoMode (Window_side, Window_side), "Sorts analizer");
+
+	const int sorts_num = 4;
+	Button *buttons[5] = {};
+	SortButton sort_buttons[sorts_num] = {
+		SortButton (bubble_sort,    sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Bubble",    Global_font, Text_size), sf::Color (0, 0, 0)),
+		SortButton (quick_sort,     sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Quick",     Global_font, Text_size), sf::Color (0, 0, 0)),
+		SortButton (selection_sort, sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Selection", Global_font, Text_size), sf::Color (0, 0, 0)),
+		SortButton (gnome_sort,     sf::Vector2f (Button_x_side, Button_y_side), sf::Text ("Gnome",     Global_font, Text_size), sf::Color (0, 0, 0))
+	};
+	
+	int button_x_pos = 10;
+	for (int i = 0; i < sorts_num; ++i)
+	{
+		sort_buttons[i].set_fill_color (sf::Color::Yellow);
+		sort_buttons[i].set_text_color (sf::Color::Black);
+		sort_buttons[i].set_position (sf::Vector2f(button_x_pos, Graph_y_pos + 50));
+		button_x_pos += (Button_x_side + 10);
+		buttons[i] = &sort_buttons[i];
+	}
+
+	const int buttons_num = sorts_num + 1;
+	ClearButton clear_butt;
+	clear_butt.set_fill_color (sf::Color::Yellow);
+	clear_butt.set_text_color (sf::Color::Black);
+	clear_butt.set_position (sf::Vector2f(5, Graph_y_pos + 20));
+	buttons[sorts_num] = &clear_butt;
+
+	while (window.isOpen ())
+	{
+		window.clear (sf::Color (255, 255, 255));
+
+		for (int i = 0; i < buttons_num; ++i)
+			buttons[i]->draw (window);
+
+		sf::Event event;
+
+		while (window.pollEvent (event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close ();
+
+			if (static_cast<int> (event.key.code) == static_cast<int> (sf::Mouse::Left))
+			{
+				sf::Vector2i mouse_pos = sf::Mouse::getPosition (window);
+				
+				if (event.type == sf::Event::MouseButtonPressed)
+				{
+					for (int i = 0; i < buttons_num; ++i)
+					{
+						if (buttons[i]->contains (mouse_pos.x, mouse_pos.y))
+						{
+							buttons[i]->action ();
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		window.display ();
+	}
+
+
+/*
 	Global_font.loadFromFile (Text_format);
 	sf::Text compares_title = sf::Text ("Compares",    Global_font, Text_size);
 	sf::Text assigs_title   = sf::Text ("Assignments", Global_font, Text_size);
@@ -365,6 +347,6 @@ int main()
 
 		window.display();
 	}
- 
+ */
 	return 0;
 }
